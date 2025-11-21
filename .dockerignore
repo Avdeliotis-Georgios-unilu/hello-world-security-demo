@@ -1,0 +1,16 @@
+.git
+.gitignore
+
+target/
+.m2/
+
+.idea/
+.vscode/
+*.iml
+
+.DS_Store
+Thumbs.db
+
+README.md
+
+.github/
