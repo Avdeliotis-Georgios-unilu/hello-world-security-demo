@@ -13,14 +13,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+
       - name: Build with Maven
         run: mvn clean package
+
       - name: Upload SBOMs as artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -28,13 +31,14 @@ jobs:
           path: |
             target/hello-world-bom.json
             target/hello-world-bom.xml
-          retention-days: 30
+          retention-days: 30  # Keep artifacts for 30 days
+
       - name: Display generated SBOM
         run: |
-          echo "CycloneDX SBOM (JSON format)"
+          echo "=== CycloneDX SBOM (JSON) ==="
           cat target/hello-world-bom.json | head -20
           echo ""
-          echo "SBOM Component Count"
+          echo "=== SBOM Component Count ==="
           grep -c '"name"' target/hello-world-bom.json || echo "0"
 
   security-scan:
@@ -44,17 +48,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+
       - name: Run Maven package
         run: mvn clean package
+
       - name: Install Grype
         run: |
           curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+
       - name: Scan SBOM for vulnerabilities
         run: |
           grype sbom:target/hello-world-bom.json --fail-on high
