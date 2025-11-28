@@ -1,0 +1,54 @@
+name: Docker Scout Security Scan
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'Dockerfile'
+      - 'src/**'
+      - 'pom.xml'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-scan:
+    name: Build and Scan Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          tags: hello-world-app:${{ github.sha }}
+          load: true  # Load image into Docker (don't push to registry)
+
+      - name: Run Docker Scout security scan
+        uses: docker/scout-action@v1
+        with:
+          command: cves
+          image: hello-world-app:${{ github.sha }}
+          # only consider critical and high severity
+          only-severities: critical,high
+          # fail workflow if critical/high found
+          exit-code: true
+
+      - name: Generate Docker Scout SBOM
+        uses: docker/scout-action@v1
+        if: always()
+        with:
+          command: sbom
+          image: hello-world-app:${{ github.sha }}
+
+      - name: Get recommendations
+        uses: docker/scout-action@v1
+        if: always()
+        with:
+          command: recommendations
+          image: hello-world-app:${{ github.sha }}
