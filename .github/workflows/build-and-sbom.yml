@@ -59,6 +59,7 @@ jobs:
       - name: Run Maven package
         run: mvn clean package
 
+        
       # Grype install
       # - name: Install Grype
       #   run: |
