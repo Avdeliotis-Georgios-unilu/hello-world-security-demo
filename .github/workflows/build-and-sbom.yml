@@ -59,13 +59,13 @@ jobs:
       - name: Run Maven package
         run: mvn clean package
 
-        
-      # Grype install
-      # - name: Install Grype
-      #   run: |
-      #    curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
 
-      # - name: Scan SBOM for vulnerabilities
-      #   run: |
-      #     grype sbom:target/hello-world-bom.json --fail-on high
-      #     grype sbom:target/hello-world-bom.json -o table
+      # Grype install
+      - name: Install Grype
+        run: |
+         curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Scan SBOM for vulnerabilities
+        run: |
+          grype sbom:target/hello-world-bom.json --fail-on high
+          grype sbom:target/hello-world-bom.json -o table
